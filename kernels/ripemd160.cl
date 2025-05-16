@@ -94,7 +94,4 @@ __kernel void ripemd160(__global const uchar* input, __global uchar* output)
     output[12] = h3 & 0xff; output[13] = (h3 >> 8) & 0xff; output[14] = (h3 >> 16) & 0xff; output[15] = (h3 >> 24) & 0xff;
     output[16] = h4 & 0xff; output[17] = (h4 >> 8) & 0xff; output[18] = (h4 >> 16) & 0xff; output[19] = (h4 >> 24) & 0xff;
         
-
-
-
 }

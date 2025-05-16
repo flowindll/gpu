@@ -35,7 +35,7 @@ std::string load_kernel(const std::string& filename) {
 
 int main() {
     try {
-        std::string message = "abc";
+        std::string message = "SALUT FLORIN";
         auto input = ripemd160_pad(message);
 
         // Încarcă kernelul
