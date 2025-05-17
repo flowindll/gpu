@@ -33,13 +33,26 @@ std::string load_kernel(const std::string& filename) {
     return std::string(std::istreambuf_iterator<char>(file), {});
 }
 
+std::vector<unsigned char> hex_to_bytes(const std::string& hex) {
+    std::vector<unsigned char> bytes;
+    bytes.reserve(hex.size() / 2);
+    for (size_t i = 0; i < hex.size(); i += 2) {
+        std::string byteString = hex.substr(i, 2);
+        unsigned char byte = (unsigned char)strtol(byteString.c_str(), nullptr, 16);
+        bytes.push_back(byte);
+    }
+    return bytes;
+}
+
+
 int main() {
     try {
-        std::string message = "SALUT FLORIN";
-        auto input = ripemd160_pad(message);
+        std::string hex_sha256 = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad";
+        auto sha256_bytes = hex_to_bytes(hex_sha256);
+        auto input = ripemd160_pad(std::string(sha256_bytes.begin(), sha256_bytes.end()));
 
         // Încarcă kernelul
-        std::string source = load_kernel("test.cl");
+        std::string source = load_kernel("kernels/ripemd160.cl");
 
         // Inițializare OpenCL
         std::vector<cl::Platform> platforms;
