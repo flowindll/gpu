@@ -18,7 +18,7 @@ int main() {
     }
 
     // ======================= 2. Citire fișier kernel =================
-    std::ifstream file("kernels/sha256.cl");
+    std::ifstream file("kernels\\sha256.cl");
     if (!file.is_open()) {
         std::cerr << "Nu pot deschide fisierul sha256.cl\n";
         return 1;
@@ -67,7 +67,7 @@ int main() {
         return 1;
     }
 
-    kernel = clCreateKernel(program, "sha256_kernel", &ret);
+    kernel = clCreateKernel(program, "sha256", &ret);
 
     // ======================= 6. Set kernel args =======================
     ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), &input_buf);

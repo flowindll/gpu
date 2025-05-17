@@ -47,12 +47,12 @@ std::vector<unsigned char> hex_to_bytes(const std::string& hex) {
 
 int main() {
     try {
-        std::string hex_sha256 = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad";
-        auto sha256_bytes = hex_to_bytes(hex_sha256);
-        auto input = ripemd160_pad(std::string(sha256_bytes.begin(), sha256_bytes.end()));
+        std::string hex_sha256 = "abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcaxxx";
+        //auto sha256_bytes = hex_to_bytes(hex_sha256);
+        //auto input = ripemd160_pad(hex_sha256);
 
         // Încarcă kernelul
-        std::string source = load_kernel("kernels/ripemd160.cl");
+        std::string source = load_kernel("kernels\\ripemd160.cl");
 
         // Inițializare OpenCL
         std::vector<cl::Platform> platforms;
@@ -76,13 +76,14 @@ int main() {
         cl::CommandQueue queue(context, device);
 
         // Creează buffer pentru input și output
-        cl::Buffer inputBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, input.size(), input.data());
+        cl::Buffer inputBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, hex_sha256.size(), hex_sha256.data());
         cl::Buffer outputBuffer(context, CL_MEM_WRITE_ONLY, HASH_SIZE);
 
         // Creează kernelul
         cl::Kernel kernel(program, "ripemd160");
         kernel.setArg(0, inputBuffer);
         kernel.setArg(1, outputBuffer);
+        kernel.setArg(2, (int)hex_sha256.size());
 
         // Rulează kernelul
         queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(1), cl::NullRange);

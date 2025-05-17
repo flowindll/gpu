@@ -37,6 +37,27 @@ __constant uchar SS[80] =
     8, 5, 12, 9, 12, 5, 14, 6, 8, 13, 6, 5, 15, 13, 11, 11,
 };
 
+void ripemd160_pad(__global const uchar* input, uchar* output, uint length)
+{
+    uint i = 0;
+
+    for (i = 0; i < length; ++i)
+    {
+        output[i] = input[i];
+    }
+
+    output[i++] = 0x80;
+
+    while ((i % 64) != 56)
+        output[i++] = 0x00;
+
+    ulong bit_len = (ulong)(length) * 8;
+    for (int j = 0; j < 8; ++j) {
+        output[i++] = (uchar)((bit_len >> (8 * j)) & 0xFF);
+    }
+
+
+}
 
 uint algo(uint j, uint x, uint y, uint z)
 {
@@ -53,7 +74,7 @@ uint ROL(uint x, uchar y)
     return (x << y) | (x >> (32 - y));
 }
 
-__kernel void ripemd160(__global const uchar* input, __global uchar* output)
+__kernel void ripemd160(__global const uchar* input, __global uchar* output, uint length)
 {
     uint h0 = 0x67452301;
     uint h1 = 0xEFCDAB89;
@@ -61,12 +82,17 @@ __kernel void ripemd160(__global const uchar* input, __global uchar* output)
     uint h3 = 0x10325476;
     uint h4 = 0xC3D2E1F0;
 
+    uchar padded[64];
+
+    ripemd160_pad(input, padded, length);
+
     uint X[16];
     for (int i = 0; i < 16; i++) {
-    X[i] = ((uint)input[i * 4]) |
-            ((uint)input[i * 4 + 1] << 8) |
-            ((uint)input[i * 4 + 2] << 16) |
-            ((uint)input[i * 4 + 3] << 24);
+    X[i] = ((uint)padded[i * 4]) |
+            ((uint)padded[i * 4 + 1] << 8) |
+            ((uint)padded[i * 4 + 2] << 16) |
+            ((uint)padded[i * 4 + 3] << 24);
+    
     }
 
     uint A1 = h0, B1 = h1, C1 = h2, D1 = h3, E1 = h4;
